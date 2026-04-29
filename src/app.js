@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import reminderRoutes from "./routes/reminder.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import pushRoutes from "./routes/push.routes.js";
-
 const app = express();
 
 // ─── CORS ────────────────────────────────────────────────────────────────────
@@ -26,7 +25,7 @@ app.use(
       }
     },
     credentials: true,
-  })
+  }),
 );
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
