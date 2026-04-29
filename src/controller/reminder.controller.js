@@ -9,7 +9,9 @@ export const createReminder = async (req, res) => {
 
     // Input validation
     if (!title || !dateTime) {
-      return res.status(400).json({ message: "Title and dateTime are required" });
+      return res
+        .status(400)
+        .json({ message: "Title and dateTime are required" });
     }
 
     const reminderDate = new Date(dateTime);
@@ -18,7 +20,9 @@ export const createReminder = async (req, res) => {
     }
 
     if (reminderDate <= new Date()) {
-      return res.status(400).json({ message: "Reminder dateTime must be in the future" });
+      return res
+        .status(400)
+        .json({ message: "Reminder dateTime must be in the future" });
     }
 
     const reminder = await Reminder.create({
@@ -160,7 +164,7 @@ export const markComplete = async (req, res) => {
     const reminder = await Reminder.findOneAndUpdate(
       { _id: req.params.id, user: req.user._id },
       { completed: true },
-      { new: true }
+      { new: true },
     );
 
     if (!reminder) {
@@ -174,5 +178,30 @@ export const markComplete = async (req, res) => {
   } catch (error) {
     console.error("Mark complete error:", error.message);
     return res.status(500).json({ message: "Server error. Please try again." });
+  }
+};
+
+export const markIncomplete = async (req, res) => {
+  try {
+    const reminder = await Reminder.findById(req.params.id);
+
+    if (!reminder) {
+      return res.status(404).json({ message: "Reminder not found" });
+    }
+
+    // ✅ UPDATE STATUS
+    reminder.completed = false;
+
+    // ✅ SAVE TO DB
+    await reminder.save();
+
+    // ✅ RETURN UPDATED DATA
+    return res.status(200).json({
+      message: "Reminder marked as incomplete",
+      reminder,
+    });
+  } catch (error) {
+    console.error("Mark incomplete error:", error.message);
+    res.status(500).json({ message: "Server error" });
   }
 };

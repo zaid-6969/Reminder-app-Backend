@@ -6,6 +6,7 @@ import {
   updateReminder,
   deleteReminder,
   markComplete,
+  markIncomplete,
 } from "../controller/reminder.controller.js";
 import protect from "../middleware/auth.middleware.js";
 
@@ -14,15 +15,16 @@ const router = express.Router();
 // All reminder routes require authentication
 router.use(protect);
 
-router.route("/")
-  .get(getReminders)
-  .post(createReminder);
+router.route("/").get(getReminders).post(createReminder);
 
-router.route("/:id")
+router
+  .route("/:id")
   .get(getReminderById)
   .put(updateReminder)
   .delete(deleteReminder);
 
 router.patch("/:id/complete", markComplete);
+
+router.patch("/:id/incomplete", markIncomplete);
 
 export default router;
