@@ -8,7 +8,7 @@ const app = express();
 
 // ─── CORS ────────────────────────────────────────────────────────────────────
 const allowedOrigins = [
-  "http://localhost:5173",
+  "https://reminder-app-frontend-puce.vercel.app",
   "http://localhost:3000",
   // Add your production frontend URL here e.g.:
   // process.env.FRONTEND_URL
