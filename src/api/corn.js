@@ -1,5 +1,5 @@
-import connectDB from "../src/config/database.js";
-import Reminder from "../src/models/Reminder.model.js";
+import connectDB from "../config/database.js";
+import Reminder from "../models/Reminder.model.js";
 import webPush from "web-push";
 
 webPush.setVapidDetails(
