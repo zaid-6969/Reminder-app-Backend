@@ -1,18 +1,23 @@
 {
   "version": 2,
   "builds": [
-    { "src": "server.js", "use": "@vercel/node" }
+    { "src": "server.js", "use": "@vercel/node" },
+    { "src": "api/cron.js", "use": "@vercel/node" }
   ],
   "routes": [
     {
+      "src": "ser/api/cron",
+      "dest": "/api/cron.js"
+    },
+    {
       "src": "/(.*)",
-      "headers": {
-        "Access-Control-Allow-Origin": "https://reminder-app-backend-five.vercel.app/api/v1",
-        "Access-Control-Allow-Credentials": "true",
-        "Access-Control-Allow-Methods": "GET,POST,PUT,PATCH,DELETE,OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type, Authorization"
-      },
       "dest": "/server.js"
+    }
+  ],
+  "crons": [
+    {
+      "path": "/api/cron",
+      "schedule": "* * * * *"
     }
   ]
 }
