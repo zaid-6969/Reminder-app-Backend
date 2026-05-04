@@ -7,6 +7,7 @@ import pushRoutes from "./routes/push.routes.js";
 import webPush from "web-push";
 import nodemailer from "nodemailer";
 import Reminder from "./models/Reminder.model.js";
+import connectDB from "./config/database.js";
 
 const app = express();
 
@@ -45,7 +46,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
 
-// ─── /api/cron — Vercel calls this every minute via vercel.json crons ─────────
+// ─── Push + Email setup ───────────────────────────────────────────────────────
 if (process.env.VAPID_PUBLIC_KEY && process.env.VAPID_PRIVATE_KEY) {
   webPush.setVapidDetails(
     `mailto:${process.env.EMAIL_USER || "admin@remindly.app"}`,
@@ -62,8 +63,12 @@ if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
   });
 }
 
+// ─── /api/cron — Vercel calls this every minute ───────────────────────────────
 app.get("/api/cron", async (req, res) => {
   try {
+    // Always ensure DB is connected (Vercel serverless has no persistent state)
+    await connectDB();
+
     const now = new Date();
     const oneMinuteAgo = new Date(now.getTime() - 60 * 1000);
 
@@ -96,6 +101,8 @@ app.get("/api/cron", async (req, res) => {
           if (e.statusCode === 404 || e.statusCode === 410) {
             user.pushSubscription = null;
             await user.save();
+          } else {
+            console.error("[Push] Error:", e.message);
           }
         }
       }
@@ -123,7 +130,11 @@ app.get("/api/cron", async (req, res) => {
       await reminder.save();
     }
 
-    return res.status(200).json({ ok: true, processed: reminders.length, time: now.toISOString() });
+    return res.status(200).json({
+      ok: true,
+      processed: reminders.length,
+      time: now.toISOString(),
+    });
   } catch (err) {
     console.error("[Cron] Error:", err.message);
     return res.status(500).json({ error: err.message });
